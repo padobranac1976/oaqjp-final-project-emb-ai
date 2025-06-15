@@ -1,4 +1,5 @@
 import requests
+import json
 
 def emotion_detector(text_to_analyse):
     url = 'https://sn-watson-emotion.labs.skills.network/' + \
@@ -6,5 +7,11 @@ def emotion_detector(text_to_analyse):
     headers = {"grpc-metadata-mm-model-id": "emotion_aggregated-workflow_lang_en_stock"}
     input_json = { "raw_document": { "text": text_to_analyse } }
     response = requests.post(url, json=input_json, headers=headers)
-    return response.text
+    return format_response(response.text)
+
+def format_response(response_to_format):
+    dictionary = json.loads(response_to_format)
+    formated_response = dictionary["emotionPredictions"][0]["emotion"]
+    formated_response['dominant_emotion'] = max(formated_response, key=formated_response.get)
+    return formated_response
 
